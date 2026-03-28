@@ -12,6 +12,8 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 6f;
     public float jumpHeight = 1.6f;
     public float gravity = -20f;
+    // public float fallMultiplier = 2.5f;
+    // public float lowJumpMultiplier = 2f;
     public float rotationSpeed = 12f;
 
     [Header("Ground Check")]
@@ -22,9 +24,13 @@ public class PlayerMovement : MonoBehaviour
     [Header("Camera Reference")]
     public Transform cameraTransform;
 
+    [Header("Animation")]
+    public Animator animator;
+
     private CharacterController controller;
     private Vector3 velocity;
-    private bool isGrounded;
+    [SerializeField] private bool isGrounded;
+    [SerializeField] private float currentSpeed;
 
     private void Awake()
     {
@@ -37,6 +43,7 @@ public class PlayerMovement : MonoBehaviour
         Move();
         Jump();
         ApplyGravity();
+        UpdateAnimator();
     }
 
     private void GroundCheck()
@@ -64,6 +71,8 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3 move = camForward * input.y + camRight * input.x;
 
+        currentSpeed = move.magnitude;
+
         if (move.sqrMagnitude > 0.001f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(move);
@@ -87,7 +96,32 @@ public class PlayerMovement : MonoBehaviour
 
     private void ApplyGravity()
     {
-        velocity.y += gravity * Time.deltaTime;
+        bool jumpHeld = jumpAction.action.IsPressed();
+
+        // if (velocity.y < 0f)
+        // {
+        //     // szybsze opadanie
+        //     velocity.y += gravity * fallMultiplier * Time.deltaTime;
+        // }
+        // if (velocity.y > 0f && !jumpHeld)
+        // {
+            // krótszy skok po puszczeniu przycisku
+        //     velocity.y += gravity * lowJumpMultiplier * Time.deltaTime;
+        // }
+        // else
+        // {
+            // normalne wznoszenie
+            velocity.y += gravity * Time.deltaTime;
+        // }
+
         controller.Move(velocity * Time.deltaTime);
+    }
+
+    private void UpdateAnimator()
+    {
+        if (animator == null) return;
+
+        animator.SetFloat("Speed", currentSpeed);
+        animator.SetBool("IsGrounded", isGrounded);
     }
 }

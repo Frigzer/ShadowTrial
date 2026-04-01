@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     public Transform currentSpawnPoint;
 
     private int deathCount = 0;
+    private int currentCheckpointIndex = -1;
 
     private void Awake()
     {
@@ -47,9 +48,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void SetSpawnPoint(Transform newSpawn)
+    public void TrySetCheckpoint(Transform newSpawn, int checkpointIndex)
     {
-        currentSpawnPoint = newSpawn;
+        if (checkpointIndex > currentCheckpointIndex)
+        {
+            currentCheckpointIndex = checkpointIndex;
+            currentSpawnPoint = newSpawn;
+            Debug.Log("Activated checkpoint: " + checkpointIndex);
+        }
     }
 
     private void UpdateDeathUI()

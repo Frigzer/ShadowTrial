@@ -971,7 +971,7 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 423612134}
   m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: d9cd8eb4a074cd84ab2686c58bcf21d9, type: 3}
+  m_Avatar: {fileID: 9000000, guid: dd6052af0158cc142b264de2c6225038, type: 3}
   m_Controller: {fileID: 9100000, guid: dbfc389516c620c4780c8e2028265e35, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
@@ -1751,6 +1751,7 @@ GameObject:
   - component: {fileID: 1196536146}
   - component: {fileID: 1196536145}
   - component: {fileID: 1196536144}
+  - component: {fileID: 1196536147}
   m_Layer: 0
   m_Name: Checkpoint_2
   m_TagString: Untagged
@@ -1809,6 +1810,20 @@ Transform:
   - {fileID: 689999568}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1196536147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1196536143}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b478ee169c6d534cb807eee8ab2369c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CheckpointGizmo
+  fillColor: {r: 0, g: 1, b: 0, a: 0.25}
+  wireColor: {r: 0, g: 1, b: 0, a: 0.9}
 --- !u!1001 &1261946424
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1993,6 +2008,7 @@ GameObject:
   - component: {fileID: 1412628164}
   - component: {fileID: 1412628163}
   - component: {fileID: 1412628162}
+  - component: {fileID: 1412628165}
   m_Layer: 0
   m_Name: Checkpoint_1
   m_TagString: Untagged
@@ -2051,6 +2067,20 @@ Transform:
   - {fileID: 1892784413}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1412628165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1412628161}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b478ee169c6d534cb807eee8ab2369c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  fillColor: {r: 0, g: 1, b: 0, a: 0.25}
+  wireColor: {r: 0, g: 1, b: 0, a: 0.9}
 --- !u!1 &1466572555
 GameObject:
   m_ObjectHideFlags: 0
@@ -2176,6 +2206,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49b35ff68b6b60d4f8ead1241dcf7fe5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  fillColor: {r: 1, g: 0, b: 0, a: 0.25}
+  wireColor: {r: 1, g: 0, b: 0, a: 0.9}
 --- !u!1 &1629492072
 GameObject:
   m_ObjectHideFlags: 0

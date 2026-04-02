@@ -3,18 +3,20 @@ using UnityEngine;
 [RequireComponent(typeof(BoxCollider))]
 public class KillZoneGizmo : MonoBehaviour
 {
+    [SerializeField] private Color fillColor = new Color(1f, 0f, 0f, 0.25f);
+    [SerializeField] private Color wireColor = new Color(1f, 0f, 0f, 0.9f);
+
     private void OnDrawGizmos()
     {
         BoxCollider box = GetComponent<BoxCollider>();
 
-        Gizmos.color = new Color(1f, 0f, 0f, 0.25f);
-
         Matrix4x4 oldMatrix = Gizmos.matrix;
         Gizmos.matrix = transform.localToWorldMatrix;
 
+        Gizmos.color = fillColor;
         Gizmos.DrawCube(box.center, box.size);
 
-        Gizmos.color = new Color(1f, 0f, 0f, 0.9f);
+        Gizmos.color = wireColor;
         Gizmos.DrawWireCube(box.center, box.size);
 
         Gizmos.matrix = oldMatrix;

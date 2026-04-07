@@ -67,5 +67,28 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "ShadowTrial.slnx"
+    "dotnet.defaultSolution": "ShadowTrial.slnx",
+
+    "cSpell.words": [
+        "Addressables",
+        "booproj",
+        "consulo",
+        "ddressable",
+        "ecordings",
+        "ettings",
+        "ibrary",
+        "opendb",
+        "pidb",
+        "respawn",
+        "respawning",
+        "ssets",
+        "sysinfo",
+        "treaming",
+        "uild",
+        "uilds",
+        "unitypackage",
+        "unityproj",
+        "userprefs",
+        "utmp"
+    ]
 }

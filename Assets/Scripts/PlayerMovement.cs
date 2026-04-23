@@ -12,8 +12,6 @@ public class PlayerMovement : MonoBehaviour
     public float moveSpeed = 6f;
     public float jumpHeight = 1.6f;
     public float gravity = -20f;
-    // public float fallMultiplier = 2.5f;
-    // public float lowJumpMultiplier = 2f;
     public float rotationSpeed = 12f;
 
     [Header("Ground Check")]
@@ -98,21 +96,7 @@ public class PlayerMovement : MonoBehaviour
     {
         bool jumpHeld = jumpAction.action.IsPressed();
 
-        // if (velocity.y < 0f)
-        // {
-        //     // szybsze opadanie
-        //     velocity.y += gravity * fallMultiplier * Time.deltaTime;
-        // }
-        // if (velocity.y > 0f && !jumpHeld)
-        // {
-            // krótszy skok po puszczeniu przycisku
-        //     velocity.y += gravity * lowJumpMultiplier * Time.deltaTime;
-        // }
-        // else
-        // {
-            // normalne wznoszenie
-            velocity.y += gravity * Time.deltaTime;
-        // }
+        velocity.y += gravity * Time.deltaTime;
 
         controller.Move(velocity * Time.deltaTime);
     }

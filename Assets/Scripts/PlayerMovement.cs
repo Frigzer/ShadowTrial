@@ -13,11 +13,16 @@ public class PlayerMovement : MonoBehaviour
     public float jumpHeight = 1.6f;
     public float gravity = -20f;
     public float rotationSpeed = 12f;
+    public float fallMultiplier = 1.7f;
+    public float lowJumpMultiplier = 1.8f;
 
     [Header("Ground Check")]
-    public Transform groundCheck;
-    public float groundDistance = 0.2f;
+    public float groundedOffset = -0.14f;
+    public float groundedRadius = 0.28f;
     public LayerMask groundMask;
+
+    [Header("Fall")]
+    public float fallTimeout = 0.15f;
 
     [Header("Camera Reference")]
     public Transform cameraTransform;
@@ -25,32 +30,93 @@ public class PlayerMovement : MonoBehaviour
     [Header("Animation")]
     public Animator animator;
 
+    [Header("Audio")]
+    public AudioClip landingAudioClip;
+    public AudioClip[] footstepAudioClips;
+    [Range(0f, 1f)] public float footstepVolume = 0.5f;
+    [Range(0f, 1f)] public float landingVolume = 0.5f;
+
+    [Header("Landing")]
+    public float minFallTimeForLanding = 0.12f;
+    public float minFallVelocityForLanding = -6f;
+
     private CharacterController controller;
     private Vector3 velocity;
+
     [SerializeField] private bool isGrounded;
     [SerializeField] private float currentSpeed;
+
+    private float fallTimeoutDelta;
+    private bool wasGroundedLastFrame;
+    private float airTime;
+    private bool wasFalling;
+    private float verticalVelocityBeforeGroundCheck;
+
+    private static readonly int SpeedHash = Animator.StringToHash("Speed");
+    private static readonly int IsGroundedHash = Animator.StringToHash("IsGrounded");
+    private static readonly int JumpHash = Animator.StringToHash("Jump");
+    private static readonly int ShouldFallHash = Animator.StringToHash("ShouldFall");
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
     }
 
+    private void Start()
+    {
+        fallTimeoutDelta = fallTimeout;
+        wasGroundedLastFrame = isGrounded;
+    }
+
     private void Update()
     {
+        verticalVelocityBeforeGroundCheck = velocity.y;
+        
         GroundCheck();
         Move();
         Jump();
         ApplyGravity();
         UpdateAnimator();
+        HandleLandingAudio();
+
+        if (isGrounded)
+            airTime = 0f;
+        else
+            airTime += Time.deltaTime;
+
+        wasGroundedLastFrame = isGrounded;
     }
 
     private void GroundCheck()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
+        Vector3 spherePosition = new Vector3(
+            transform.position.x,
+            transform.position.y + groundedOffset,
+            transform.position.z
+        );
 
-        if (isGrounded && velocity.y < 0f)
+        isGrounded = Physics.CheckSphere(
+            spherePosition,
+            groundedRadius,
+            groundMask,
+            QueryTriggerInteraction.Ignore
+        );
+
+        if (isGrounded)
         {
-            velocity.y = -2f;
+            fallTimeoutDelta = fallTimeout;
+
+            if (velocity.y < 0f)
+            {
+                velocity.y = -2f;
+            }
+        }
+        else
+        {
+            if (fallTimeoutDelta > 0f)
+            {
+                fallTimeoutDelta -= Time.deltaTime;
+            }
         }
     }
 
@@ -68,7 +134,6 @@ public class PlayerMovement : MonoBehaviour
         camRight.Normalize();
 
         Vector3 move = camForward * input.y + camRight * input.x;
-
         currentSpeed = move.magnitude;
 
         if (move.sqrMagnitude > 0.001f)
@@ -89,6 +154,11 @@ public class PlayerMovement : MonoBehaviour
         if (jumpAction.action.WasPressedThisFrame() && isGrounded)
         {
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+
+            if (animator != null)
+            {
+                animator.SetTrigger(JumpHash);
+            }
         }
     }
 
@@ -96,16 +166,74 @@ public class PlayerMovement : MonoBehaviour
     {
         bool jumpHeld = jumpAction.action.IsPressed();
 
-        velocity.y += gravity * Time.deltaTime;
+        if (velocity.y < 0f)
+        {
+            velocity.y += gravity * fallMultiplier * Time.deltaTime;
+        }
+        else if (velocity.y > 0f && !jumpHeld)
+        {
+            velocity.y += gravity * lowJumpMultiplier * Time.deltaTime;
+        }
+        else
+        {
+            velocity.y += gravity * Time.deltaTime;
+        }
 
-        controller.Move(velocity * Time.deltaTime);
+        controller.Move(Vector3.up * velocity.y * Time.deltaTime);
     }
 
     private void UpdateAnimator()
     {
         if (animator == null) return;
 
-        animator.SetFloat("Speed", currentSpeed);
-        animator.SetBool("IsGrounded", isGrounded);
+        animator.SetFloat(SpeedHash, currentSpeed);
+        animator.SetBool(IsGroundedHash, isGrounded);
+
+        bool shouldFall = !isGrounded && velocity.y < -0.1f && fallTimeoutDelta <= 0f;
+        animator.SetBool(ShouldFallHash, shouldFall);
+    }
+
+    private void HandleLandingAudio()
+    {
+        bool wasAirborneLongEnough = airTime >= minFallTimeForLanding;
+        bool wasFallingFastEnough = velocity.y <= minFallVelocityForLanding;
+
+        if (!wasGroundedLastFrame && isGrounded && landingAudioClip != null &&
+            (wasAirborneLongEnough || wasFallingFastEnough))
+        {
+            AudioSource.PlayClipAtPoint(
+                landingAudioClip,
+                transform.TransformPoint(controller.center),
+                landingVolume
+            );
+        }
+    }
+
+    public void OnFootstep()
+    {
+        if (!isGrounded) return;
+        if (footstepAudioClips == null || footstepAudioClips.Length == 0) return;
+
+        int index = Random.Range(0, footstepAudioClips.Length);
+        AudioSource.PlayClipAtPoint(
+            footstepAudioClips[index],
+            transform.TransformPoint(controller.center),
+            footstepVolume
+        );
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = isGrounded
+            ? new Color(0f, 1f, 0f, 0.35f)
+            : new Color(1f, 0f, 0f, 0.35f);
+
+        Vector3 spherePosition = new Vector3(
+            transform.position.x,
+            transform.position.y + groundedOffset,
+            transform.position.z
+        );
+
+        Gizmos.DrawSphere(spherePosition, groundedRadius);
     }
 }

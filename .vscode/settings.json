@@ -71,12 +71,15 @@
 
     "cSpell.words": [
         "Addressables",
+        "asmdef",
         "booproj",
         "consulo",
         "ddressable",
         "ecordings",
         "ettings",
+        "hlsl",
         "ibrary",
+        "inputactions",
         "opendb",
         "pidb",
         "respawn",
@@ -88,6 +91,7 @@
         "uilds",
         "unitypackage",
         "unityproj",
+        "unityyamlmerge",
         "userprefs",
         "utmp"
     ]

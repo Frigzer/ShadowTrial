@@ -42,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
 
     private CharacterController controller;
     private Vector3 velocity;
+    private MovingPlatform currentPlatform;
 
     [SerializeField] private bool isGrounded;
     [SerializeField] private float currentSpeed;
@@ -73,6 +74,8 @@ public class PlayerMovement : MonoBehaviour
         verticalVelocityBeforeGroundCheck = velocity.y;
         
         GroundCheck();
+        CheckMovingPlatform();
+        ApplyPlatformMovement();
         Move();
         Jump();
         ApplyGravity();
@@ -220,6 +223,65 @@ public class PlayerMovement : MonoBehaviour
             transform.TransformPoint(controller.center),
             footstepVolume
         );
+    }
+
+    private void CheckMovingPlatform()
+    {
+        if (!isGrounded)
+        {
+            currentPlatform = null;
+            return;
+        }
+
+        Vector3 spherePosition = new Vector3(
+            transform.position.x,
+            transform.position.y + groundedOffset,
+            transform.position.z
+        );
+
+        Collider[] hits = Physics.OverlapSphere(
+            spherePosition,
+            groundedRadius + 0.05f,
+            groundMask,
+            QueryTriggerInteraction.Ignore
+        );
+
+        MovingPlatform detectedPlatform = null;
+
+        foreach (Collider hit in hits)
+        {
+            MovingPlatform platform = hit.GetComponentInParent<MovingPlatform>();
+            if (platform != null)
+            {
+                detectedPlatform = platform;
+                break;
+            }
+        }
+
+        currentPlatform = detectedPlatform;
+    }
+
+    private void ApplyPlatformMovement()
+    {
+        if (currentPlatform == null) return;
+
+        if (currentPlatform.DeltaMovement != Vector3.zero)
+        {
+            controller.Move(currentPlatform.DeltaMovement);
+        }
+    }
+
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        MovingPlatform platform = hit.collider.GetComponentInParent<MovingPlatform>();
+
+        if (platform != null)
+        {
+            if (hit.normal.y > 0.3f)
+            {
+                currentPlatform = platform;
+            }
+        }
     }
 
     private void OnDrawGizmosSelected()

@@ -1,7 +1,22 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 
-# Unity / game assets via Git LFS
+# Code / text Unity files
+*.cs text diff=csharp
+*.shader text
+*.cginc text
+*.hlsl text
+*.json text
+*.asmdef text
+*.inputactions text
+*.meta text
+
+# Unity YAML files
+*.unity text merge=unityyamlmerge
+*.prefab text merge=unityyamlmerge
+*.asset text merge=unityyamlmerge
+
+# Large binary assets via Git LFS
 *.psd filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
 *.jpg filter=lfs diff=lfs merge=lfs -text

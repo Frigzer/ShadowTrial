@@ -43,6 +43,7 @@ public class PlayerMovement : MonoBehaviour
     private CharacterController controller;
     private Vector3 velocity;
     private MovingPlatform currentPlatform;
+    private FallingPlatform currentFallingPlatform;
 
     [SerializeField] private bool isGrounded;
     [SerializeField] private float currentSpeed;
@@ -230,6 +231,7 @@ public class PlayerMovement : MonoBehaviour
         if (!isGrounded)
         {
             currentPlatform = null;
+            currentFallingPlatform = null;
             return;
         }
 
@@ -246,19 +248,29 @@ public class PlayerMovement : MonoBehaviour
             QueryTriggerInteraction.Ignore
         );
 
-        MovingPlatform detectedPlatform = null;
+        MovingPlatform detectedMovingPlatform = null;
+        FallingPlatform detectedFallingPlatform = null;
 
         foreach (Collider hit in hits)
         {
-            MovingPlatform platform = hit.GetComponentInParent<MovingPlatform>();
-            if (platform != null)
+            if (detectedMovingPlatform == null)
             {
-                detectedPlatform = platform;
-                break;
+                detectedMovingPlatform = hit.GetComponentInParent<MovingPlatform>();
+            }
+
+            if (detectedFallingPlatform == null)
+            {
+                detectedFallingPlatform = hit.GetComponentInParent<FallingPlatform>();
             }
         }
 
-        currentPlatform = detectedPlatform;
+        currentPlatform = detectedMovingPlatform;
+        currentFallingPlatform = detectedFallingPlatform;
+
+        if (currentFallingPlatform != null)
+        {
+            currentFallingPlatform.TriggerPlatform();
+        }
     }
 
     private void ApplyPlatformMovement()

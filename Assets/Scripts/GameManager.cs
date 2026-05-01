@@ -46,6 +46,15 @@ public class GameManager : MonoBehaviour
         {
             controller.enabled = true;
         }
+
+        FallingPlatform[] fallingPlatforms = FindObjectsByType<FallingPlatform>(FindObjectsSortMode.None);
+        foreach (FallingPlatform platform in fallingPlatforms)
+        {
+            if (platform.resetOnPlayerRespawn)
+            {
+                platform.ResetPlatform();
+            }
+        }
     }
 
     public void TrySetCheckpoint(Transform newSpawn, int checkpointIndex)

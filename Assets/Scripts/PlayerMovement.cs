@@ -267,6 +267,11 @@ public class PlayerMovement : MonoBehaviour
         currentPlatform = detectedMovingPlatform;
         currentFallingPlatform = detectedFallingPlatform;
 
+        if (currentPlatform != null)
+        {
+            currentPlatform.ActivatePlatform();
+        }
+
         if (currentFallingPlatform != null)
         {
             currentFallingPlatform.TriggerPlatform();

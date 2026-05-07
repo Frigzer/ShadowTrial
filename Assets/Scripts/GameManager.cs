@@ -7,12 +7,15 @@ public class GameManager : MonoBehaviour
 
     [Header("UI")]
     public TextMeshProUGUI deathsText;
+    public TextMeshProUGUI timeText;
 
     [Header("Spawn")]
     public Transform currentSpawnPoint;
 
     private int deathCount = 0;
     private int currentCheckpointIndex = -1;
+    private float elapsedTime = 0f;
+    private bool timerRunning = true;
 
     private void Awake()
     {
@@ -73,5 +76,22 @@ public class GameManager : MonoBehaviour
         {
             deathsText.text = "Deaths: " + deathCount;
         }
+    }
+    private void Update()
+    {
+        if (!timerRunning) return;
+
+        elapsedTime += Time.deltaTime;
+        UpdateTimeUI();
+    }
+    private void UpdateTimeUI()
+    {
+        if (timeText == null) return;
+
+        int minutes = Mathf.FloorToInt(elapsedTime / 60f);
+        int seconds = Mathf.FloorToInt(elapsedTime % 60f);
+        int milliseconds = Mathf.FloorToInt((elapsedTime * 100f) % 100f);
+
+        timeText.text = $"Time: {minutes:00}:{seconds:00}.{milliseconds:00}";
     }
 }

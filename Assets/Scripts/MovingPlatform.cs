@@ -10,11 +10,17 @@ public class MovingPlatform : MonoBehaviour
     public float speed = 2f;
     public float waitTime = 0.5f;
 
+    [Header("Activation")]
+    public bool startOnPlayerEnter = false;
+    public bool activateOnlyOnce = true;
+
     public Vector3 DeltaMovement { get; private set; }
 
     private Transform targetPoint;
     private float waitTimer;
     private Vector3 lastPosition;
+
+    private bool isActivated = false;
 
     private void Start()
     {
@@ -29,10 +35,22 @@ public class MovingPlatform : MonoBehaviour
         targetPoint = pointB;
         waitTimer = waitTime;
         lastPosition = transform.position;
+
+        if (!startOnPlayerEnter)
+        {
+            isActivated = true;
+        }
     }
 
     private void Update()
     {
+        if (!isActivated)
+        {
+            DeltaMovement = Vector3.zero;
+            lastPosition = transform.position;
+            return;
+        }
+
         if (waitTimer > 0f)
         {
             waitTimer -= Time.deltaTime;
@@ -56,10 +74,18 @@ public class MovingPlatform : MonoBehaviour
         lastPosition = transform.position;
     }
 
-    // private void LateUpdate()
-    // {
-    //     DeltaMovement = Vector3.zero;
-    // }
+    public void ActivatePlatform()
+    {
+        isActivated = true;
+    }
+
+    private void OnControllerColliderHitProxy(Transform other)
+    {
+        if (!startOnPlayerEnter) return;
+        if (!other.CompareTag("Player")) return;
+
+        ActivatePlatform();
+    }
 
     private void OnDrawGizmos()
     {

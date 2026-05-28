@@ -18,7 +18,7 @@ public class FallingPlatform : MonoBehaviour
     public Transform visualTarget;
 
     [Header("References")]
-    public Collider platformCollider;
+    public Collider[] platformColliders;
     public Renderer[] platformRenderers;
 
     private Vector3 startPosition;
@@ -33,14 +33,14 @@ public class FallingPlatform : MonoBehaviour
         startPosition = transform.position;
         startRotation = transform.rotation;
 
-        if (platformCollider == null)
+        if (platformColliders == null || platformColliders.Length == 0)
         {
-            platformCollider = GetComponent<Collider>();
+            platformColliders = GetComponentsInChildren<Collider>(true);
         }
 
         if (platformRenderers == null || platformRenderers.Length == 0)
         {
-            platformRenderers = GetComponentsInChildren<Renderer>();
+            platformRenderers = GetComponentsInChildren<Renderer>(true);
         }
 
         if (visualTarget == null)
@@ -106,9 +106,12 @@ public class FallingPlatform : MonoBehaviour
 
     private void SetPlatformActive(bool active)
     {
-        if (platformCollider != null)
+        foreach (Collider col in platformColliders)
         {
-            platformCollider.enabled = active;
+            if (col != null)
+            {
+                col.enabled = active;
+            }
         }
 
         foreach (Renderer rend in platformRenderers)

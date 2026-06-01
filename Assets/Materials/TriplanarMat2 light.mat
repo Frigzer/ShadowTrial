@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: TriplanarMat2
+  m_Name: TriplanarMat2 light
   m_Shader: {fileID: -6465566751694194690, guid: e18b05188b788c245839bb208a74f722, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -49,7 +49,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Top:
-        m_Texture: {fileID: 2800000, guid: c675def6c1fe1a044967591c53fd29ca, type: 3}
+        m_Texture: {fileID: 2800000, guid: 7eace487c14d94f4180ea9621885296c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Top_Normalmap:

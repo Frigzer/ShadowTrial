@@ -1,0 +1,113 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &8068999030354918535
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1455315458384516268, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: daa7cf6903973dc0eac9646690febbb3, type: 2}
+    - target: {fileID: 2039108583650060249, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_Name
+      value: Snowball
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.34
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.93
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.41
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5284909481936072808, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5501066601102499988, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7544574045787913355, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7544574045787913355, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_Color.g
+      value: 0.65795946
+      objectReference: {fileID: 0}
+    - target: {fileID: 7544574045787913355, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      propertyPath: m_Color.r
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2039108583650060249, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -8770652348219005455}
+  m_SourcePrefab: {fileID: 100100000, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+--- !u!1 &8338003122885483358 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2039108583650060249, guid: 729d1c0a3114b57b7a68e40bd347b915, type: 3}
+  m_PrefabInstance: {fileID: 8068999030354918535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &-8770652348219005455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8338003122885483358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da54d709fcadf424498d69d20956af0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TrapProjectile
+  speed: 40
+  lifetime: 1

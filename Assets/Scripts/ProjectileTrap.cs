@@ -9,8 +9,7 @@ public class ProjectileTrap : MonoBehaviour
     public Transform targetPoint;
 
     [Header("Activation")]
-    public bool fireOnStart = true;
-    public bool activateOnlyOnce = false;
+    public bool activeOnStart = true;
 
     [Header("Burst Settings")]
     public int shotsPerBurst = 3;
@@ -22,7 +21,7 @@ public class ProjectileTrap : MonoBehaviour
     public bool fireAllSpawnPointsAtOnce = true;
     public bool alternateSpawnPoints = false;
 
-    private bool isActivated = false;
+    private bool isActive = false;
     private Coroutine fireRoutine;
     private int currentSpawnIndex = 0;
 
@@ -35,7 +34,7 @@ public class ProjectileTrap : MonoBehaviour
             return;
         }
 
-        if (fireOnStart)
+        if (activeOnStart)
         {
             ActivateTrap();
         }
@@ -43,24 +42,26 @@ public class ProjectileTrap : MonoBehaviour
 
     public void ActivateTrap()
     {
-        if (isActivated && activateOnlyOnce) return;
-        if (fireRoutine != null) return;
+        if (isActive) return;
 
-        isActivated = true;
-        fireRoutine = StartCoroutine(FireLoop());
+        isActive = true;
+
+        if (fireRoutine == null)
+        {
+            fireRoutine = StartCoroutine(FireLoop());
+        }
     }
 
     public void DeactivateTrap()
     {
+        if (!isActive) return;
+
+        isActive = false;
+
         if (fireRoutine != null)
         {
             StopCoroutine(fireRoutine);
             fireRoutine = null;
-        }
-
-        if (!activateOnlyOnce)
-        {
-            isActivated = false;
         }
     }
 
@@ -71,17 +72,25 @@ public class ProjectileTrap : MonoBehaviour
             yield return new WaitForSeconds(startDelay);
         }
 
-        while (true)
+        while (isActive)
         {
             yield return StartCoroutine(FireBurst());
-            yield return new WaitForSeconds(timeBetweenBursts);
+
+            if (isActive)
+            {
+                yield return new WaitForSeconds(timeBetweenBursts);
+            }
         }
+
+        fireRoutine = null;
     }
 
     private IEnumerator FireBurst()
     {
         for (int i = 0; i < shotsPerBurst; i++)
         {
+            if (!isActive) yield break;
+
             FireProjectiles();
 
             if (i < shotsPerBurst - 1)
@@ -99,6 +108,7 @@ public class ProjectileTrap : MonoBehaviour
             {
                 FireFromPoint(spawnPoints[i]);
             }
+
             return;
         }
 
@@ -114,6 +124,8 @@ public class ProjectileTrap : MonoBehaviour
 
     private void FireFromPoint(Transform spawnPoint)
     {
+        if (projectilePrefab == null || spawnPoint == null) return;
+
         TrapProjectile projectile = Instantiate(
             projectilePrefab,
             spawnPoint.position,

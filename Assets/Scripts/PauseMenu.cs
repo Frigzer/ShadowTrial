@@ -70,6 +70,11 @@ public class PauseMenu : MonoBehaviour
 
     private void OnPausePressed(InputAction.CallbackContext context)
     {
+        if (GameManager.Instance != null && GameManager.Instance.IsDead)
+        {
+            return;
+        }
+
         TogglePause();
     }
 

@@ -24,6 +24,7 @@ public class GameManager : MonoBehaviour
     [Header("Score")]
     public int DeathCount => deathCount;
     public float ElapsedTime => elapsedTime;
+    public bool IsDead => isDead;
 
     private int deathCount = 0;
     private int currentCheckpointIndex = -1;
@@ -83,6 +84,8 @@ public class GameManager : MonoBehaviour
 
         CharacterController controller = player.GetComponent<CharacterController>();
         PlayerMovement movement = player.GetComponent<PlayerMovement>();
+        Animator animator = player.GetComponentInChildren<Animator>();
+        MouseLook mouseLook = FindFirstObjectByType<MouseLook>();
 
         if (controller != null)
         {
@@ -94,22 +97,38 @@ public class GameManager : MonoBehaviour
             movement.enabled = false;
         }
 
+        if (animator != null)
+        {
+            animator.speed = 0f;
+        }
+
+        if (mouseLook != null)
+        {
+            mouseLook.enabled = false;
+        }
+
         if (deathPanel != null)
         {
             deathPanel.SetActive(true);
         }
 
+        Time.timeScale = 0f;
+
         if (autoRespawn)
         {
-            yield return new WaitForSeconds(autoRespawnDelay);
+            yield return new WaitForSecondsRealtime(autoRespawnDelay);
             RespawnPlayer(player);
         }
     }
 
     public void RespawnPlayer(GameObject player)
     {
+        Time.timeScale = 1f;
+
         CharacterController controller = player.GetComponent<CharacterController>();
         PlayerMovement movement = player.GetComponent<PlayerMovement>();
+        Animator animator = player.GetComponentInChildren<Animator>();
+        MouseLook mouseLook = FindFirstObjectByType<MouseLook>();
 
         if (controller != null)
         {
@@ -130,10 +149,23 @@ public class GameManager : MonoBehaviour
             movement.enabled = true;
         }
 
+        if (animator != null)
+        {
+            animator.speed = 1f;
+        }
+
+        if (mouseLook != null)
+        {
+            mouseLook.enabled = true;
+        }
+
         if (deathPanel != null)
         {
             deathPanel.SetActive(false);
         }
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
 
         timerRunning = true;
         isDead = false;

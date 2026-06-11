@@ -215,6 +215,8 @@ public class PlayerMovement : MonoBehaviour
 
     public void OnFootstep()
     {
+        if (Time.timeScale <= 0f) return;
+        if (GameManager.Instance != null && GameManager.Instance.IsDead) return;
         if (!isGrounded) return;
         if (footstepAudioClips == null || footstepAudioClips.Length == 0) return;
 

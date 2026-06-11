@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LevelEnd : MonoBehaviour
+public class LevelFinish : MonoBehaviour
 {
     public EndScreen endScreen;
 

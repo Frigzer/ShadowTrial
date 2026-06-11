@@ -16,6 +16,10 @@ public class GameManager : MonoBehaviour
     public bool autoRespawn = true;
     public float autoRespawnDelay = 1.5f;
 
+    [Header("Score")]
+    public int DeathCount => deathCount;
+    public float ElapsedTime => elapsedTime;
+
     private int deathCount = 0;
     private int currentCheckpointIndex = -1;
     private float elapsedTime = 0f;
@@ -181,5 +185,19 @@ public class GameManager : MonoBehaviour
         int milliseconds = Mathf.FloorToInt((elapsedTime * 100f) % 100f);
 
         timeText.text = $"Time: {minutes:00}:{seconds:00}.{milliseconds:00}";
+    }
+
+    public void StopTimer()
+    {
+        timerRunning = false;
+    }
+
+    public string GetFormattedTime()
+    {
+        int minutes = Mathf.FloorToInt(elapsedTime / 60f);
+        int seconds = Mathf.FloorToInt(elapsedTime % 60f);
+        int milliseconds = Mathf.FloorToInt((elapsedTime * 100f) % 100f);
+
+        return $"{minutes:00}:{seconds:00}.{milliseconds:00}";
     }
 }

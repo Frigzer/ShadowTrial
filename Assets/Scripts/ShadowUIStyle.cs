@@ -6,6 +6,8 @@ public static class ShadowUIStyle
 {
     private const float ButtonWidth = 300f;
     private const float ButtonHeight = 70f;
+    private const float CompactButtonWidth = 190f;
+    private const float CompactButtonHeight = 48f;
     private const string MenuFontName = "Shojumaru-Regular SDF";
 
     private static readonly Color Ink = new Color(0.035f, 0.039f, 0.051f, 0.94f);
@@ -17,6 +19,7 @@ public static class ShadowUIStyle
     private static readonly Color Gold = new Color(0.92f, 0.63f, 0.23f, 1f);
     private static readonly Color TransparentBlack = new Color(0f, 0f, 0f, 0.68f);
     private static readonly Color OverlayBlack = new Color(0f, 0f, 0f, 0.58f);
+    private static readonly Color SolidBlack = new Color(0f, 0f, 0f, 1f);
 
     private static TMP_FontAsset menuFont;
 
@@ -68,13 +71,18 @@ public static class ShadowUIStyle
         Image image = panel.GetComponent<Image>();
         if (image != null)
         {
-            image.color = IsFullScreenOverlay(panel) ? OverlayBlack : Ink;
+            image.color = IsDeathOverlay(panel) ? SolidBlack : IsFullScreenOverlay(panel) ? OverlayBlack : Ink;
         }
 
         RectTransform rect = panel.GetComponent<RectTransform>();
         if (rect != null)
         {
             rect.localScale = Vector3.one;
+
+            if (IsLeaderboardPanel(panel))
+            {
+                rect.sizeDelta = new Vector2(520f, 580f);
+            }
         }
 
         if (!IsFullScreenOverlay(panel))
@@ -84,6 +92,36 @@ public static class ShadowUIStyle
         }
 
         StyleRoot(panel);
+
+        if (IsPauseOrFinishPanel(panel))
+        {
+            StyleModalFrames(panel);
+        }
+    }
+
+    public static void StyleHud(TextMeshProUGUI deathsText, TextMeshProUGUI timeText)
+    {
+        GameObject hudPanel = FindSharedParent(deathsText, timeText);
+        if (hudPanel != null)
+        {
+            RectTransform panelRect = hudPanel.GetComponent<RectTransform>();
+            if (panelRect != null)
+            {
+                panelRect.sizeDelta = new Vector2(360f, 118f);
+            }
+
+            Image panelImage = hudPanel.GetComponent<Image>();
+            if (panelImage != null)
+            {
+                panelImage.color = new Color(0.035f, 0.039f, 0.051f, 0.82f);
+            }
+
+            AddOrUpdateOutline(hudPanel, Gold, new Vector2(1f, -1f));
+            AddOrUpdateShadow(hudPanel, TransparentBlack, new Vector2(6f, -6f));
+        }
+
+        StyleHudText(deathsText, new Vector2(22f, -24f));
+        StyleHudText(timeText, new Vector2(22f, -68f));
     }
 
     private static void StyleImage(Image image)
@@ -98,6 +136,12 @@ public static class ShadowUIStyle
         if (name.Contains("background"))
         {
             image.color = new Color(0.025f, 0.028f, 0.036f, 1f);
+            return;
+        }
+
+        if (IsDeathOverlay(image.gameObject))
+        {
+            image.color = SolidBlack;
             return;
         }
 
@@ -147,7 +191,9 @@ public static class ShadowUIStyle
         RectTransform rect = button.GetComponent<RectTransform>();
         if (rect != null)
         {
-            rect.sizeDelta = new Vector2(ButtonWidth, ButtonHeight);
+            rect.sizeDelta = IsLeaderboardButton(button)
+                ? new Vector2(CompactButtonWidth, CompactButtonHeight)
+                : new Vector2(ButtonWidth, ButtonHeight);
         }
 
         AddOrUpdateOutline(button.gameObject, Gold, new Vector2(1f, -1f));
@@ -168,6 +214,37 @@ public static class ShadowUIStyle
             text.font = font;
         }
 
+        if (IsHudText(text))
+        {
+            text.color = Bone;
+            text.fontStyle = FontStyles.Bold;
+            text.fontSize = 22f;
+            text.characterSpacing = 0.5f;
+            text.alignment = TextAlignmentOptions.Left;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
+            text.overflowMode = TextOverflowModes.Overflow;
+            return;
+        }
+
+        if (IsLeaderboardScoresText(text))
+        {
+            text.color = Bone;
+            text.fontStyle = FontStyles.Normal;
+            text.fontSize = 18f;
+            text.characterSpacing = 0f;
+            text.alignment = TextAlignmentOptions.Left;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
+            text.overflowMode = TextOverflowModes.Overflow;
+
+            RectTransform rect = text.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                rect.sizeDelta = new Vector2(480f, 400f);
+            }
+
+            return;
+        }
+
         text.textWrappingMode = TextWrappingModes.Normal;
         text.overflowMode = TextOverflowModes.Overflow;
 
@@ -185,7 +262,7 @@ public static class ShadowUIStyle
         {
             text.color = Bone;
             text.fontStyle = FontStyles.Bold;
-            text.fontSize = Mathf.Max(text.fontSize, 24f);
+            text.fontSize = IsLeaderboardButtonText(text) ? 17f : Mathf.Max(text.fontSize, 24f);
             text.characterSpacing = 1.2f;
             return;
         }
@@ -241,6 +318,155 @@ public static class ShadowUIStyle
         AddOrUpdateOutline(input.gameObject, Gold, new Vector2(1f, -1f));
     }
 
+    private static void StyleHudText(TextMeshProUGUI text, Vector2 anchoredPosition)
+    {
+        if (text == null)
+        {
+            return;
+        }
+
+        TMP_FontAsset font = GetMenuFont();
+        if (font != null)
+        {
+            text.font = font;
+        }
+
+        text.color = Bone;
+        text.fontStyle = FontStyles.Bold;
+        text.fontSize = 22f;
+        text.characterSpacing = 0.5f;
+        text.alignment = TextAlignmentOptions.Left;
+        text.textWrappingMode = TextWrappingModes.NoWrap;
+        text.overflowMode = TextOverflowModes.Overflow;
+
+        RectTransform rect = text.GetComponent<RectTransform>();
+        if (rect != null)
+        {
+            rect.anchorMin = new Vector2(0f, 1f);
+            rect.anchorMax = new Vector2(0f, 1f);
+            rect.pivot = new Vector2(0f, 1f);
+            rect.anchoredPosition = anchoredPosition;
+            rect.sizeDelta = new Vector2(320f, 34f);
+        }
+    }
+
+    private static GameObject FindSharedParent(TextMeshProUGUI first, TextMeshProUGUI second)
+    {
+        if (first == null || second == null)
+        {
+            return null;
+        }
+
+        Transform current = first.transform.parent;
+        while (current != null)
+        {
+            if (second.transform.IsChildOf(current))
+            {
+                return current.gameObject;
+            }
+
+            current = current.parent;
+        }
+
+        return first.transform.parent != null ? first.transform.parent.gameObject : null;
+    }
+
+    private static bool IsHudText(TextMeshProUGUI text)
+    {
+        string name = text.gameObject.name.ToLowerInvariant();
+        if (name == "deathstext" || name == "timetext")
+        {
+            return true;
+        }
+
+        Transform parent = text.transform.parent;
+        return parent != null && parent.name.ToLowerInvariant().Contains("hud");
+    }
+
+    private static bool IsLeaderboardPanel(GameObject target)
+    {
+        return target.name.ToLowerInvariant().Contains("leaderboardpanel");
+    }
+
+    private static bool IsPauseOrFinishPanel(GameObject target)
+    {
+        string name = target.name.ToLowerInvariant();
+        return name.Contains("pausepanel") || name.Contains("finishpanel");
+    }
+
+    private static void StyleModalFrames(GameObject root)
+    {
+        foreach (Image image in root.GetComponentsInChildren<Image>(true))
+        {
+            if (!IsModalFrameCandidate(image))
+            {
+                continue;
+            }
+
+            image.color = Ink;
+            AddOrUpdateOutline(image.gameObject, Gold, new Vector2(3f, -3f));
+            AddOrUpdateShadow(image.gameObject, TransparentBlack, new Vector2(12f, -12f));
+        }
+    }
+
+    private static bool IsModalFrameCandidate(Image image)
+    {
+        if (image == null || image.GetComponent<Button>() != null || image.GetComponent<TMP_InputField>() != null)
+        {
+            return false;
+        }
+
+        if (IsFullScreenOverlay(image.gameObject) || IsDeathOverlay(image.gameObject))
+        {
+            return false;
+        }
+
+        RectTransform rect = image.GetComponent<RectTransform>();
+        if (rect == null)
+        {
+            return false;
+        }
+
+        return rect.rect.width >= 320f && rect.rect.height >= 220f;
+    }
+
+    private static bool IsLeaderboardScoresText(TextMeshProUGUI text)
+    {
+        string name = text.gameObject.name.ToLowerInvariant();
+        return name.Contains("scorestext") || name.Contains("scoreslist");
+    }
+
+    private static bool IsLeaderboardButton(Button button)
+    {
+        string name = button.gameObject.name.ToLowerInvariant();
+        return name.Contains("closeleaderboard") ||
+               name.Contains("clearscores") ||
+               name.Contains("clearrecords") ||
+               HasParentNamed(button.transform, "leaderboardpanel");
+    }
+
+    private static bool IsLeaderboardButtonText(TextMeshProUGUI text)
+    {
+        Button parentButton = text.GetComponentInParent<Button>();
+        return parentButton != null && IsLeaderboardButton(parentButton);
+    }
+
+    private static bool HasParentNamed(Transform transform, string partialName)
+    {
+        Transform current = transform.parent;
+        while (current != null)
+        {
+            if (current.name.ToLowerInvariant().Contains(partialName))
+            {
+                return true;
+            }
+
+            current = current.parent;
+        }
+
+        return false;
+    }
+
     private static bool IsFullScreenOverlay(GameObject target)
     {
         RectTransform rect = target.GetComponent<RectTransform>();
@@ -262,6 +488,11 @@ public static class ShadowUIStyle
 
         string name = target.name.ToLowerInvariant();
         return name.Contains("overlay") || name.Contains("dim") || name.Contains("fade");
+    }
+
+    private static bool IsDeathOverlay(GameObject target)
+    {
+        return target.name.ToLowerInvariant().Contains("deathpanel");
     }
 
     private static TMP_FontAsset GetMenuFont()

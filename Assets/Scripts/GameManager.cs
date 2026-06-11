@@ -1,6 +1,7 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,6 +11,10 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI deathsText;
     public TextMeshProUGUI timeText;
     public GameObject deathPanel;
+
+    [Header("Start Hint")]
+    public bool showStartHint = true;
+    public float startHintDuration = 6f;
 
     [Header("Respawn")]
     public Transform currentSpawnPoint;
@@ -45,6 +50,12 @@ public class GameManager : MonoBehaviour
 
         UpdateDeathUI();
         UpdateTimeUI();
+        ShadowUIStyle.StyleHud(deathsText, timeText);
+
+        if (showStartHint)
+        {
+            CreateStartHint();
+        }
     }
 
     private void Update()
@@ -176,6 +187,81 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void CreateStartHint()
+    {
+        Canvas canvas = FindFirstObjectByType<Canvas>();
+        if (canvas == null || FindChildByName(canvas.transform, "StartHintPanel") != null)
+        {
+            return;
+        }
+
+        GameObject panel = CreateRectObject(canvas.transform, "StartHintPanel", new Vector2(0f, -155f), new Vector2(680f, 104f));
+        panel.AddComponent<CanvasRenderer>();
+        panel.AddComponent<Image>();
+
+        TextMeshProUGUI text = CreateText(
+            panel.transform,
+            "StartHintText",
+            "Reach the finish.\nWASD - Move    Space - Jump    Mouse - Look    Esc - Pause",
+            Vector2.zero,
+            new Vector2(620f, 76f),
+            20f
+        );
+        text.alignment = TextAlignmentOptions.Center;
+
+        ShadowUIStyle.StyleRoot(panel);
+        StartCoroutine(HideStartHintAfterDelay(panel));
+    }
+
+    private IEnumerator HideStartHintAfterDelay(GameObject panel)
+    {
+        yield return new WaitForSecondsRealtime(startHintDuration);
+
+        if (panel != null)
+        {
+            panel.SetActive(false);
+        }
+    }
+
+    private TextMeshProUGUI CreateText(Transform parent, string objectName, string textValue, Vector2 anchoredPosition, Vector2 size, float fontSize)
+    {
+        GameObject textObject = CreateRectObject(parent, objectName, anchoredPosition, size);
+        textObject.AddComponent<CanvasRenderer>();
+
+        TextMeshProUGUI text = textObject.AddComponent<TextMeshProUGUI>();
+        text.text = textValue;
+        text.fontSize = fontSize;
+        text.color = Color.white;
+        text.textWrappingMode = TextWrappingModes.Normal;
+        return text;
+    }
+
+    private GameObject CreateRectObject(Transform parent, string objectName, Vector2 anchoredPosition, Vector2 size)
+    {
+        GameObject gameObject = new GameObject(objectName, typeof(RectTransform));
+        RectTransform rect = gameObject.GetComponent<RectTransform>();
+        rect.SetParent(parent, false);
+        rect.anchorMin = new Vector2(0.5f, 1f);
+        rect.anchorMax = new Vector2(0.5f, 1f);
+        rect.pivot = new Vector2(0.5f, 1f);
+        rect.anchoredPosition = anchoredPosition;
+        rect.sizeDelta = size;
+        return gameObject;
+    }
+
+    private Transform FindChildByName(Transform root, string objectName)
+    {
+        foreach (Transform child in root.GetComponentsInChildren<Transform>(true))
+        {
+            if (child.name == objectName)
+            {
+                return child;
+            }
+        }
+
+        return null;
+    }
+
     private void UpdateTimeUI()
     {
         if (timeText == null) return;
@@ -200,4 +286,24 @@ public class GameManager : MonoBehaviour
 
         return $"{minutes:00}:{seconds:00}.{milliseconds:00}";
     }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (!Application.isPlaying)
+        {
+            UnityEditor.EditorApplication.delayCall += ApplyEditorStylePreview;
+        }
+    }
+
+    private void ApplyEditorStylePreview()
+    {
+        if (this == null || Application.isPlaying)
+        {
+            return;
+        }
+
+        ShadowUIStyle.StyleHud(deathsText, timeText);
+    }
+#endif
 }

@@ -10,6 +10,12 @@ public static class ShadowUIStylePreview
     {
         ShadowUIStyle.StyleSceneCanvases();
 
+        foreach (GameManager gameManager in Object.FindObjectsByType<GameManager>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            ShadowUIStyle.StyleHud(gameManager.deathsText, gameManager.timeText);
+            EditorUtility.SetDirty(gameManager);
+        }
+
         foreach (Canvas canvas in Object.FindObjectsByType<Canvas>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             EditorUtility.SetDirty(canvas.gameObject);

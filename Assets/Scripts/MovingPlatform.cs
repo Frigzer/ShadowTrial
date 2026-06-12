@@ -12,14 +12,15 @@ public class MovingPlatform : MonoBehaviour
 
     [Header("Activation")]
     public bool startOnPlayerEnter = false;
-    public bool activateOnlyOnce = true;
+
+    [Header("Respawn Reset")]
+    public bool resetOnPlayerRespawn = false;
 
     public Vector3 DeltaMovement { get; private set; }
 
     private Transform targetPoint;
     private float waitTimer;
     private Vector3 lastPosition;
-
     private bool isActivated = false;
 
     private void Start()
@@ -31,15 +32,7 @@ public class MovingPlatform : MonoBehaviour
             return;
         }
 
-        transform.position = pointA.position;
-        targetPoint = pointB;
-        waitTimer = waitTime;
-        lastPosition = transform.position;
-
-        if (!startOnPlayerEnter)
-        {
-            isActivated = true;
-        }
+        ResetPlatform();
     }
 
     private void Update()
@@ -79,12 +72,17 @@ public class MovingPlatform : MonoBehaviour
         isActivated = true;
     }
 
-    private void OnControllerColliderHitProxy(Transform other)
+    public void ResetPlatform()
     {
-        if (!startOnPlayerEnter) return;
-        if (!other.CompareTag("Player")) return;
+        if (pointA == null || pointB == null) return;
 
-        ActivatePlatform();
+        transform.position = pointA.position;
+        targetPoint = pointB;
+        waitTimer = waitTime;
+        lastPosition = transform.position;
+        DeltaMovement = Vector3.zero;
+
+        isActivated = !startOnPlayerEnter;
     }
 
     private void OnDrawGizmos()

@@ -214,12 +214,6 @@ public class MainMenu : MonoBehaviour
         howToPanel.name = "HowToPlayPanel";
         PrepareCopiedHowToPanelChildren();
 
-        RectTransform panelRect = howToPanel.GetComponent<RectTransform>();
-        if (panelRect != null)
-        {
-            panelRect.sizeDelta = new Vector2(520f, 580f);
-        }
-
         TextMeshProUGUI title = GetOrCreateText(howToPanel.transform, "HowToTitleText", new Vector2(0f, -50f), new Vector2(440f, 70f), 42f);
         title.text = "How to Play";
         title.alignment = TextAlignmentOptions.Center;
@@ -256,11 +250,6 @@ public class MainMenu : MonoBehaviour
             {
                 copiedTitle.name = "HowToTitleText";
 
-                RectTransform titleRect = copiedTitle.GetComponent<RectTransform>();
-                if (titleRect != null)
-                {
-                    titleRect.anchoredPosition = new Vector2(0f, -50f);
-                }
             }
         }
 
@@ -322,7 +311,6 @@ public class MainMenu : MonoBehaviour
         TextMeshProUGUI text = existing != null ? existing.GetComponent<TextMeshProUGUI>() : null;
         if (text != null)
         {
-            text.fontSize = fontSize;
             return text;
         }
 
@@ -340,17 +328,7 @@ public class MainMenu : MonoBehaviour
         Button button = existing != null ? existing.GetComponent<Button>() : null;
         if (button != null)
         {
-            bool renamedFromLeaderboard = button.gameObject.name != "CloseHowToButton";
             button.gameObject.name = "CloseHowToButton";
-
-            if (renamedFromLeaderboard)
-            {
-                RectTransform rect = button.GetComponent<RectTransform>();
-                if (rect != null)
-                {
-                    rect.anchoredPosition = new Vector2(260f, 70f);
-                }
-            }
 
             TextMeshProUGUI label = button.GetComponentInChildren<TextMeshProUGUI>(true);
             if (label != null)

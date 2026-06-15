@@ -4,10 +4,6 @@ using UnityEngine.UI;
 
 public static class ShadowUIStyle
 {
-    private const float ButtonWidth = 300f;
-    private const float ButtonHeight = 70f;
-    private const float CompactButtonWidth = 190f;
-    private const float CompactButtonHeight = 48f;
     private const string MenuFontName = "Shojumaru-Regular SDF";
 
     private static readonly Color Ink = new Color(0.035f, 0.039f, 0.051f, 0.94f);
@@ -74,17 +70,6 @@ public static class ShadowUIStyle
             image.color = IsDeathOverlay(panel) ? SolidBlack : IsFullScreenOverlay(panel) ? OverlayBlack : Ink;
         }
 
-        RectTransform rect = panel.GetComponent<RectTransform>();
-        if (rect != null)
-        {
-            rect.localScale = Vector3.one;
-
-            if (IsLeaderboardPanel(panel))
-            {
-                rect.sizeDelta = new Vector2(520f, 580f);
-            }
-        }
-
         if (!IsFullScreenOverlay(panel))
         {
             AddOrUpdateOutline(panel, Gold, new Vector2(2f, -2f));
@@ -104,12 +89,6 @@ public static class ShadowUIStyle
         GameObject hudPanel = FindSharedParent(deathsText, timeText);
         if (hudPanel != null)
         {
-            RectTransform panelRect = hudPanel.GetComponent<RectTransform>();
-            if (panelRect != null)
-            {
-                panelRect.sizeDelta = new Vector2(360f, 118f);
-            }
-
             Image panelImage = hudPanel.GetComponent<Image>();
             if (panelImage != null)
             {
@@ -120,8 +99,8 @@ public static class ShadowUIStyle
             AddOrUpdateShadow(hudPanel, TransparentBlack, new Vector2(6f, -6f));
         }
 
-        StyleHudText(deathsText, new Vector2(22f, -24f));
-        StyleHudText(timeText, new Vector2(22f, -68f));
+        StyleHudText(deathsText);
+        StyleHudText(timeText);
     }
 
     private static void StyleImage(Image image)
@@ -188,14 +167,6 @@ public static class ShadowUIStyle
         colors.fadeDuration = 0.12f;
         button.colors = colors;
 
-        RectTransform rect = button.GetComponent<RectTransform>();
-        if (rect != null)
-        {
-            rect.sizeDelta = IsLeaderboardButton(button)
-                ? new Vector2(CompactButtonWidth, CompactButtonHeight)
-                : new Vector2(ButtonWidth, ButtonHeight);
-        }
-
         AddOrUpdateOutline(button.gameObject, Gold, new Vector2(1f, -1f));
         AddOrUpdateShadow(button.gameObject, TransparentBlack, new Vector2(5f, -5f));
     }
@@ -218,7 +189,6 @@ public static class ShadowUIStyle
         {
             text.color = Bone;
             text.fontStyle = FontStyles.Bold;
-            text.fontSize = 22f;
             text.characterSpacing = 0.5f;
             text.alignment = TextAlignmentOptions.Left;
             text.textWrappingMode = TextWrappingModes.NoWrap;
@@ -230,17 +200,10 @@ public static class ShadowUIStyle
         {
             text.color = Bone;
             text.fontStyle = FontStyles.Normal;
-            text.fontSize = 18f;
             text.characterSpacing = 0f;
             text.alignment = TextAlignmentOptions.Left;
             text.textWrappingMode = TextWrappingModes.NoWrap;
             text.overflowMode = TextOverflowModes.Overflow;
-
-            RectTransform rect = text.GetComponent<RectTransform>();
-            if (rect != null)
-            {
-                rect.sizeDelta = new Vector2(480f, 400f);
-            }
 
             return;
         }
@@ -252,7 +215,6 @@ public static class ShadowUIStyle
         {
             text.color = Gold;
             text.fontStyle = FontStyles.Bold;
-            text.fontSize = Mathf.Max(text.fontSize, 42f);
             text.characterSpacing = 2.5f;
             AddOrUpdateShadow(text.gameObject, TransparentBlack, new Vector2(4f, -4f));
             return;
@@ -262,7 +224,6 @@ public static class ShadowUIStyle
         {
             text.color = Bone;
             text.fontStyle = FontStyles.Bold;
-            text.fontSize = IsLeaderboardButtonText(text) ? 17f : Mathf.Max(text.fontSize, 24f);
             text.characterSpacing = 1.2f;
             return;
         }
@@ -270,12 +231,10 @@ public static class ShadowUIStyle
         if (name.Contains("score") || name.Contains("result") || name.Contains("death") || name.Contains("time"))
         {
             text.color = Bone;
-            text.fontSize = Mathf.Max(text.fontSize, 24f);
             return;
         }
 
         text.color = MutedBone;
-        text.fontSize = Mathf.Max(text.fontSize, 20f);
     }
 
     private static void StyleInput(TMP_InputField input)
@@ -300,7 +259,6 @@ public static class ShadowUIStyle
             }
 
             input.textComponent.color = Bone;
-            input.textComponent.fontSize = Mathf.Max(input.textComponent.fontSize, 24f);
         }
 
         if (input.placeholder is TextMeshProUGUI placeholder)
@@ -318,7 +276,7 @@ public static class ShadowUIStyle
         AddOrUpdateOutline(input.gameObject, Gold, new Vector2(1f, -1f));
     }
 
-    private static void StyleHudText(TextMeshProUGUI text, Vector2 anchoredPosition)
+    private static void StyleHudText(TextMeshProUGUI text)
     {
         if (text == null)
         {
@@ -333,21 +291,10 @@ public static class ShadowUIStyle
 
         text.color = Bone;
         text.fontStyle = FontStyles.Bold;
-        text.fontSize = 22f;
         text.characterSpacing = 0.5f;
         text.alignment = TextAlignmentOptions.Left;
         text.textWrappingMode = TextWrappingModes.NoWrap;
         text.overflowMode = TextOverflowModes.Overflow;
-
-        RectTransform rect = text.GetComponent<RectTransform>();
-        if (rect != null)
-        {
-            rect.anchorMin = new Vector2(0f, 1f);
-            rect.anchorMax = new Vector2(0f, 1f);
-            rect.pivot = new Vector2(0f, 1f);
-            rect.anchoredPosition = anchoredPosition;
-            rect.sizeDelta = new Vector2(320f, 34f);
-        }
     }
 
     private static GameObject FindSharedParent(TextMeshProUGUI first, TextMeshProUGUI second)

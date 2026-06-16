@@ -5,6 +5,7 @@ using UnityEngine.UI;
 public static class ShadowUIStyle
 {
     private const string MenuFontName = "Shojumaru-Regular SDF";
+    private const string FrameRootName = "ShadowUIFrame";
 
     private static readonly Color Ink = new Color(0.035f, 0.039f, 0.051f, 0.94f);
     private static readonly Color InkSoft = new Color(0.075f, 0.082f, 0.105f, 0.92f);
@@ -13,8 +14,9 @@ public static class ShadowUIStyle
     private static readonly Color Blood = new Color(0.48f, 0.08f, 0.075f, 1f);
     private static readonly Color BloodBright = new Color(0.68f, 0.15f, 0.11f, 1f);
     private static readonly Color Gold = new Color(0.92f, 0.63f, 0.23f, 1f);
+    private static readonly Color FrameGold = new Color(0.98f, 0.70f, 0.24f, 1f);
+    private static readonly Color FrameBrown = new Color(0.28f, 0.14f, 0.055f, 1f);
     private static readonly Color TransparentBlack = new Color(0f, 0f, 0f, 0.68f);
-    private static readonly Color OverlayBlack = new Color(0f, 0f, 0f, 0.58f);
     private static readonly Color SolidBlack = new Color(0f, 0f, 0f, 1f);
 
     private static TMP_FontAsset menuFont;
@@ -67,13 +69,21 @@ public static class ShadowUIStyle
         Image image = panel.GetComponent<Image>();
         if (image != null)
         {
-            image.color = IsDeathOverlay(panel) ? SolidBlack : IsFullScreenOverlay(panel) ? OverlayBlack : Ink;
+            if (IsDeathOverlay(panel))
+            {
+                image.color = SolidBlack;
+            }
+            else if (!IsFullScreenOverlay(panel))
+            {
+                image.color = Ink;
+            }
         }
 
         if (!IsFullScreenOverlay(panel))
         {
             AddOrUpdateOutline(panel, Gold, new Vector2(2f, -2f));
-            AddOrUpdateShadow(panel, TransparentBlack, new Vector2(10f, -10f));
+            RemoveShadow(panel);
+            AddOrUpdateFrame(panel);
         }
 
         StyleRoot(panel);
@@ -96,7 +106,8 @@ public static class ShadowUIStyle
             }
 
             AddOrUpdateOutline(hudPanel, Gold, new Vector2(1f, -1f));
-            AddOrUpdateShadow(hudPanel, TransparentBlack, new Vector2(6f, -6f));
+            RemoveShadow(hudPanel);
+            AddOrUpdateFrame(hudPanel);
         }
 
         StyleHudText(deathsText);
@@ -106,6 +117,11 @@ public static class ShadowUIStyle
     private static void StyleImage(Image image)
     {
         if (image == null)
+        {
+            return;
+        }
+
+        if (IsFrameElement(image.gameObject))
         {
             return;
         }
@@ -126,15 +142,15 @@ public static class ShadowUIStyle
 
         if (IsFullScreenOverlay(image.gameObject))
         {
-            image.color = OverlayBlack;
             return;
         }
 
-        if (name.Contains("panel"))
+        if (name.Contains("panel") || name.Contains("window"))
         {
             image.color = Ink;
             AddOrUpdateOutline(image.gameObject, Gold, new Vector2(2f, -2f));
-            AddOrUpdateShadow(image.gameObject, TransparentBlack, new Vector2(10f, -10f));
+            RemoveShadow(image.gameObject);
+            AddOrUpdateFrame(image.gameObject);
             return;
         }
 
@@ -201,7 +217,6 @@ public static class ShadowUIStyle
             text.color = Bone;
             text.fontStyle = FontStyles.Normal;
             text.characterSpacing = 0f;
-            text.alignment = TextAlignmentOptions.Left;
             text.textWrappingMode = TextWrappingModes.NoWrap;
             text.overflowMode = TextOverflowModes.Overflow;
 
@@ -352,13 +367,14 @@ public static class ShadowUIStyle
 
             image.color = Ink;
             AddOrUpdateOutline(image.gameObject, Gold, new Vector2(3f, -3f));
-            AddOrUpdateShadow(image.gameObject, TransparentBlack, new Vector2(12f, -12f));
+            RemoveShadow(image.gameObject);
+            AddOrUpdateFrame(image.gameObject);
         }
     }
 
     private static bool IsModalFrameCandidate(Image image)
     {
-        if (image == null || image.GetComponent<Button>() != null || image.GetComponent<TMP_InputField>() != null)
+        if (image == null || IsFrameElement(image.gameObject) || image.GetComponent<Button>() != null || image.GetComponent<TMP_InputField>() != null)
         {
             return false;
         }
@@ -442,6 +458,17 @@ public static class ShadowUIStyle
         return target.name.ToLowerInvariant().Contains("deathpanel");
     }
 
+    private static bool IsFrameElement(GameObject target)
+    {
+        if (target == null)
+        {
+            return false;
+        }
+
+        return target.name.StartsWith(FrameRootName) ||
+               HasParentNamed(target.transform, FrameRootName.ToLowerInvariant());
+    }
+
     private static TMP_FontAsset GetMenuFont()
     {
         if (menuFont != null)
@@ -482,6 +509,30 @@ public static class ShadowUIStyle
         shadow.useGraphicAlpha = true;
     }
 
+    private static void RemoveShadow(GameObject target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        Shadow shadow = target.GetComponent<Shadow>();
+        if (shadow == null)
+        {
+            return;
+        }
+
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+        {
+            Object.DestroyImmediate(shadow);
+            return;
+        }
+#endif
+
+        Object.Destroy(shadow);
+    }
+
     private static void AddOrUpdateOutline(GameObject target, Color color, Vector2 distance)
     {
         Outline outline = target.GetComponent<Outline>();
@@ -492,6 +543,128 @@ public static class ShadowUIStyle
 
         outline.effectColor = color;
         outline.effectDistance = distance;
-        outline.useGraphicAlpha = true;
+        outline.useGraphicAlpha = false;
+    }
+
+    private static void AddOrUpdateFrame(GameObject target)
+    {
+        if (target == null || IsFrameElement(target) || IsFullScreenOverlay(target) || IsDeathOverlay(target))
+        {
+            return;
+        }
+
+        RectTransform targetRect = target.GetComponent<RectTransform>();
+        if (targetRect == null)
+        {
+            return;
+        }
+
+        Transform existingFrame = target.transform.Find(FrameRootName);
+        RectTransform frameRect;
+        if (existingFrame == null)
+        {
+            GameObject frameObject = new GameObject(FrameRootName, typeof(RectTransform));
+            frameObject.layer = target.layer;
+            frameRect = frameObject.GetComponent<RectTransform>();
+            frameRect.SetParent(target.transform, false);
+        }
+        else
+        {
+            frameRect = existingFrame.GetComponent<RectTransform>();
+        }
+
+        if (frameRect == null)
+        {
+            return;
+        }
+
+        frameRect.anchorMin = Vector2.zero;
+        frameRect.anchorMax = Vector2.one;
+        frameRect.pivot = new Vector2(0.5f, 0.5f);
+        frameRect.offsetMin = Vector2.zero;
+        frameRect.offsetMax = Vector2.zero;
+        frameRect.localScale = Vector3.one;
+        frameRect.SetAsLastSibling();
+
+        AddOrUpdateFrameStrip(frameRect, "ShadowUIFrame_OuterTop", FrameBrown, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), Vector2.zero, new Vector2(0f, 7f));
+        AddOrUpdateFrameStrip(frameRect, "ShadowUIFrame_OuterBottom", FrameBrown, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), Vector2.zero, new Vector2(0f, 7f));
+        AddOrUpdateFrameStrip(frameRect, "ShadowUIFrame_OuterLeft", FrameBrown, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), Vector2.zero, new Vector2(7f, 0f));
+        AddOrUpdateFrameStrip(frameRect, "ShadowUIFrame_OuterRight", FrameBrown, new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f), Vector2.zero, new Vector2(7f, 0f));
+
+        RemoveFrameStrip(frameRect, "ShadowUIFrame_CornerTopLeft");
+        RemoveFrameStrip(frameRect, "ShadowUIFrame_CornerTopRight");
+        RemoveFrameStrip(frameRect, "ShadowUIFrame_CornerBottomLeft");
+        RemoveFrameStrip(frameRect, "ShadowUIFrame_CornerBottomRight");
+
+        AddOrUpdateFrameStrip(frameRect, "ShadowUIFrame_InnerTop", FrameGold, new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -3f), new Vector2(-6f, 2f));
+        AddOrUpdateFrameStrip(frameRect, "ShadowUIFrame_InnerBottom", FrameGold, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(0.5f, 0f), new Vector2(0f, 3f), new Vector2(-6f, 2f));
+        AddOrUpdateFrameStrip(frameRect, "ShadowUIFrame_InnerLeft", FrameGold, new Vector2(0f, 0f), new Vector2(0f, 1f), new Vector2(0f, 0.5f), new Vector2(3f, 0f), new Vector2(2f, -6f));
+        AddOrUpdateFrameStrip(frameRect, "ShadowUIFrame_InnerRight", FrameGold, new Vector2(1f, 0f), new Vector2(1f, 1f), new Vector2(1f, 0.5f), new Vector2(-3f, 0f), new Vector2(2f, -6f));
+    }
+
+    private static void AddOrUpdateFrameStrip(
+        RectTransform parent,
+        string stripName,
+        Color color,
+        Vector2 anchorMin,
+        Vector2 anchorMax,
+        Vector2 pivot,
+        Vector2 anchoredPosition,
+        Vector2 sizeDelta)
+    {
+        Transform existingStrip = parent.Find(stripName);
+        Image image;
+        bool created = existingStrip == null;
+
+        if (created)
+        {
+            GameObject stripObject = new GameObject(stripName, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+            stripObject.layer = parent.gameObject.layer;
+            RectTransform stripRect = stripObject.GetComponent<RectTransform>();
+            stripRect.SetParent(parent, false);
+            image = stripObject.GetComponent<Image>();
+        }
+        else
+        {
+            image = existingStrip.GetComponent<Image>();
+        }
+
+        if (image == null)
+        {
+            return;
+        }
+
+        RectTransform rect = image.GetComponent<RectTransform>();
+        rect.anchorMin = anchorMin;
+        rect.anchorMax = anchorMax;
+        rect.pivot = pivot;
+        rect.anchoredPosition = anchoredPosition;
+        rect.sizeDelta = sizeDelta;
+        rect.localScale = Vector3.one;
+
+        image.raycastTarget = false;
+        if (created || image.color.a < 0.99f)
+        {
+            image.color = color;
+        }
+    }
+
+    private static void RemoveFrameStrip(RectTransform parent, string stripName)
+    {
+        Transform existingStrip = parent.Find(stripName);
+        if (existingStrip == null)
+        {
+            return;
+        }
+
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+        {
+            Object.DestroyImmediate(existingStrip.gameObject);
+            return;
+        }
+#endif
+
+        Object.Destroy(existingStrip.gameObject);
     }
 }

@@ -135,6 +135,31 @@ public class PauseMenu : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
+    public void RespawnPlayerManually()
+    {
+        if (GameManager.Instance == null || GameManager.Instance.IsDead)
+        {
+            return;
+        }
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+        {
+            Debug.LogWarning("PauseMenu: Cannot respawn because no Player-tagged object was found.", this);
+            return;
+        }
+
+        if (GameManager.Instance.RespawnPlayerWithDeathPenalty(player))
+        {
+            isPaused = false;
+
+            if (pausePanel != null)
+            {
+                pausePanel.SetActive(false);
+            }
+        }
+    }
+
     public void ReturnToMainMenu()
     {
         Time.timeScale = 1f;

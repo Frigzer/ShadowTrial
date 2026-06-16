@@ -180,10 +180,38 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public bool RespawnPlayerWithDeathPenalty(GameObject player)
+    {
+        if (isDead || player == null)
+        {
+            return false;
+        }
+
+        if (currentSpawnPoint == null)
+        {
+            Debug.LogWarning("GameManager: Cannot respawn player because currentSpawnPoint is missing.", this);
+            return false;
+        }
+
+        deathCount++;
+        UpdateDeathUI();
+        RespawnPlayer(player);
+        return true;
+    }
+
     private void ResetRespawnObjects()
     {
         FallingPlatform[] fallingPlatforms = FindObjectsByType<FallingPlatform>(FindObjectsSortMode.None);
         foreach (FallingPlatform platform in fallingPlatforms)
+        {
+            if (platform.resetOnPlayerRespawn)
+            {
+                platform.ResetPlatform();
+            }
+        }
+
+        MovingPlatform[] movingPlatforms = FindObjectsByType<MovingPlatform>(FindObjectsSortMode.None);
+        foreach (MovingPlatform platform in movingPlatforms)
         {
             if (platform.resetOnPlayerRespawn)
             {
@@ -235,7 +263,7 @@ public class GameManager : MonoBehaviour
             panel.transform,
             "StartHintText",
             "Reach the finish.\nWASD - Move    Space - Jump    Mouse - Look    Esc - Pause",
-            Vector2.zero,
+            new Vector2(0f, -10f),
             new Vector2(620f, 76f),
             20f
         );

@@ -1,6 +1,6 @@
-# ShadowTrial
+# Shadow Trial
 
-ShadowTrial is a 3D platformer made in Unity for a university assignment. The goal is to reach the end of the level as fast as possible while avoiding traps, falling hazards, and other obstacles.
+Shadow Trial is a 3D platformer made in Unity for a university assignment. The goal is to reach the end of the level as fast as possible while avoiding traps, falling hazards, and other obstacles.
 
 ![Main menu screenshot](media/main_menu.png)
 
@@ -48,7 +48,3 @@ ShadowTrial is a 3D platformer made in Unity for a university assignment. The go
 - C#
 - TextMeshPro
 - Unity Input System
-
-## Notes
-
-This project is intended as a complete course-assignment game. The demo and screenshot assets in this README can be replaced with newer recordings or captures from the latest build.

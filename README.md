@@ -4,9 +4,9 @@ Shadow Trial is a 3D platformer made in Unity for a university assignment. The g
 
 ![Main menu screenshot](media/main_menu.png)
 
-<!-- ## Demo
+## Demo
 
-![Demo](media/demo_short.gif) -->
+![Demo](media/demo.gif)
 
 ## Gameplay
 
